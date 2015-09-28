@@ -1,6 +1,7 @@
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by max on 9/21/2015.
@@ -19,7 +20,7 @@ public class UniformCostSearch {
         while(frontier.size() != 0){
             UniformCostSearchNode current = frontier.remove();
             if(current.isGoalState()){
-                System.out.println("Nodes explored: " + closed.size());
+                System.out.println("UCS Nodes explored: " + closed.size());
                 return current;
             }
             closed.add(current);
@@ -28,28 +29,16 @@ public class UniformCostSearch {
                 if(!closed.contains(neighbor)) {
                     if (!frontier.contains(neighbor)) {
                         frontier.add(neighbor);
-                    } else {
-                        Iterator<UniformCostSearchNode> itr = frontier.iterator();
-                        UniformCostSearchNode itrNode = itr.next();
-
-                        for(; itr.hasNext(); itrNode = itr.next()) {
-                            if (itrNode.equals(neighbor)) {
-                                if(itrNode.getCost() > neighbor.getCost()){
-                                    itrNode.setCost(neighbor.getCost());
-                                }
-                            }
-                        }
                     }
                 }
             }
         }
 
-        System.out.println("Search failed, nodes explored: " + closed.size());
+        System.out.println("UCS Search failed, nodes explored: " + closed.size());
         // search failed
         return null;
     }
 
-    /* unfinished */
     public static UniformCostSearchNode searchBnB(UniformCostSearchNode root){
         // priority queue implemented by minheap under the hood
         PriorityQueue<UniformCostSearchNode> frontier = new PriorityQueue<UniformCostSearchNode>();
@@ -57,39 +46,43 @@ public class UniformCostSearch {
         // hash set for fast verification of closed nodes
         HashSet<UniformCostSearchNode> closed = new HashSet<UniformCostSearchNode>();
 
-        frontier.add(root);
+        int upperBoundCost = Integer.MAX_VALUE;
 
-        // upper bound for branch and bound
-        int upperBound = Integer.MAX_VALUE;
+        frontier.add(root);
 
         while(frontier.size() != 0){
             UniformCostSearchNode current = frontier.remove();
             if(current.isGoalState()){
-                if(current.getCost() < upperBound){
-                    upperBound = current.getCost();
-                }
+                System.out.println("UCS B&B Nodes explored: " + closed.size());
+                return current;
             }
-            closed.add(current);
-            for(UniformCostSearchNode neighbor : current.getNeighbors()){
-                if(!closed.contains(neighbor)) {
-                    if (!frontier.contains(neighbor)) {
-                        frontier.add(neighbor);
-                    } else {
-                        Iterator<UniformCostSearchNode> itr = frontier.iterator();
-                        UniformCostSearchNode itrNode = itr.next();
 
-                        for(; itr.hasNext(); itrNode = itr.next()) {
-                            if (itrNode.equals(neighbor)) {
-                                if(itrNode.getCost() > neighbor.getCost()){
-                                    itrNode.setCost(neighbor.getCost());
-                                }
-                            }
-                        }
+            // implicitly pruning the frontier
+            if(current.getCost() >= upperBoundCost){
+                // skipping due to bounding
+                continue;
+            }
+
+            closed.add(current);
+
+            PriorityQueue<UniformCostSearchNode> toAdd = new PriorityQueue<UniformCostSearchNode>();
+            for(UniformCostSearchNode neighbor : current.getNeighbors()){
+                toAdd.add(neighbor);
+            }
+
+            while(toAdd.size() != 0) {
+                UniformCostSearchNode neighbor = toAdd.remove();
+                if (neighbor.getCost() < upperBoundCost) {
+                    if (neighbor.isGoalState()) {
+                        // bounding
+                        upperBoundCost = neighbor.getCost();
                     }
+                    frontier.add(neighbor);
                 }
             }
         }
 
+        System.out.println("UCS B&B Search failed, nodes explored: " + closed.size());
         // search failed
         return null;
     }
