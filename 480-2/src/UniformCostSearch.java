@@ -15,6 +15,7 @@ public class UniformCostSearch {
         // hash set for fast verification of closed nodes
         HashSet<UniformCostSearchNode> closed = new HashSet<UniformCostSearchNode>();
 
+        closed.add(root);
         frontier.add(root);
 
         while(frontier.size() != 0){
@@ -23,7 +24,6 @@ public class UniformCostSearch {
                 System.out.println("UCS Nodes explored: " + closed.size());
                 return current;
             }
-            closed.add(current);
 
             for(UniformCostSearchNode neighbor : current.getNeighbors()){
                 if(!closed.contains(neighbor)) {

@@ -18,13 +18,13 @@ public class WeightedQueenProblem {
 
 
         String weightString = "1683742556734218618523744261857362358417815326742876135434658217";
-//String weightString = "2683541734156827341111163761458273428516143276588523164787211111";
+        //String weightString = "2683541734156827341111163761458273428516143276588523164787211111";
         byte qs[] = {};
         WeightedQueenNode q = new WeightedQueenNode(qs, 0, null);
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                weights[i][j] = Byte.parseByte(weightString.charAt(i * 8 + j) + "");
+                //weights[i][j] = Byte.parseByte(weightString.charAt(i * 8 + j) + "");
             }
         }
 
